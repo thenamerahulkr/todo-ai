@@ -273,7 +273,7 @@ export const useTasks = () => {
     }
   }, [tasks, user]);
 
-  const editTask = useCallback((taskId: string) => {
+  const editTask = useCallback(() => {
     toast.info("Edit functionality", {
       description: "Task editing will be available in the next update",
       duration: 2000

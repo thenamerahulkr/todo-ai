@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { ParsedTask } from '@/types/task';
-import { addDays, addHours, setHours, setMinutes, parseISO, isValid, parse, format } from 'date-fns';
+import { addDays, setHours, setMinutes, parseISO, isValid, } from 'date-fns';
 
 export class AITaskParser {
   private static openai: OpenAI | null = null;
@@ -115,7 +115,7 @@ Rules:
       priority: validPriorities.includes(parsed.priority) ? parsed.priority : 'medium',
       category: validCategories.includes(parsed.category) ? parsed.category : 'other',
       dueDate: this.parseDueDate(parsed.dueDate),
-      tags: Array.isArray(parsed.tags) ? parsed.tags.filter(tag => typeof tag === 'string') : []
+      tags: Array.isArray(parsed.tags) ? parsed.tags.filter((tag: unknown) => typeof tag === 'string') : []
     };
 
     console.log('AI Parser: Validated task:', result);

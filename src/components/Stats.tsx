@@ -5,12 +5,9 @@ import {
   CheckCircle2, 
   Clock, 
   AlertTriangle, 
-  TrendingUp,
   Target,
-  Zap
 } from 'lucide-react';
 import { isToday, isPast } from 'date-fns';
-
 interface StatsProps {
   tasks: Task[];
 }

@@ -22,7 +22,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { isToday, isTomorrow, isPast, compareAsc } from 'date-fns';
+import { isToday, isPast, compareAsc } from 'date-fns';
 
 interface TaskListProps {
   tasks: Task[];
