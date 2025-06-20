@@ -72,8 +72,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
   const isOverdue = task.dueDate && isPast(task.dueDate) && !task.completed;
 
-  // Show menu button when hovered OR when dropdown is open
-  const showMenuButton = isHovered || isDropdownOpen;
+  // Show menu button when hovered OR when dropdown is open OR when task is completed
+  const showMenuButton = isHovered || isDropdownOpen || task.completed;
 
   return (
     <motion.div
@@ -103,7 +103,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
       <div className="flex items-start gap-4">
         <motion.div
-          className="flex-shrink-0 mt-1"
+          className="flex-shrink-0 mt-1 relative z-20"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
@@ -138,6 +138,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.2 }}
+                  className="relative z-30"
                 >
                   <DropdownMenu 
                     open={isDropdownOpen} 
@@ -147,7 +148,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="h-8 w-8 p-0 hover:bg-secondary"
+                        className={cn(
+                          "h-8 w-8 p-0 hover:bg-secondary",
+                          task.completed && "bg-background/80 hover:bg-background border border-border"
+                        )}
                         onClick={(e) => {
                           e.stopPropagation();
                           setIsDropdownOpen(!isDropdownOpen);
@@ -158,7 +162,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent 
                       align="end" 
-                      className="glass border-border"
+                      className="glass border-border z-50"
                       onCloseAutoFocus={(e) => e.preventDefault()}
                     >
                       <DropdownMenuItem 
@@ -250,14 +254,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         </div>
       </div>
 
-      {/* Completion overlay */}
+      {/* Completion overlay - now positioned to not block the menu button */}
       <AnimatePresence>
         {task.completed && (
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            className="absolute inset-0 flex items-center justify-center bg-primary/5 rounded-2xl backdrop-blur-sm"
+            className="absolute inset-0 flex items-center justify-center bg-primary/5 rounded-2xl backdrop-blur-sm pointer-events-none"
+            style={{ zIndex: 10 }} // Lower z-index than menu button
           >
             <motion.div
               initial={{ scale: 0 }}

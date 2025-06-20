@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Task } from '@/types/task';
 import { TaskCard } from './TaskCard';
+import { EditTaskDialog } from './EditTaskDialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -22,13 +23,13 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { isToday, isPast, compareAsc } from 'date-fns';
+import { isToday, isTomorrow, isPast, compareAsc } from 'date-fns';
 
 interface TaskListProps {
   tasks: Task[];
   onToggleComplete: (id: string) => void;
   onDelete: (id: string) => void;
-  onEdit: (id: string) => void;
+  onEdit: (taskId: string, updates: Partial<Task>) => Promise<void>;
 }
 
 type FilterType = 'all' | 'pending' | 'completed' | 'overdue' | 'today' | 'upcoming';
@@ -53,6 +54,8 @@ export const TaskList: React.FC<TaskListProps> = ({
   const [filter, setFilter] = useState<FilterType>('all');
   const [sortBy, setSortBy] = useState<SortType>('dueDate');
   const [viewType, setViewType] = useState<ViewType>('grid');
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const filteredAndSortedTasks = useMemo(() => {
     let filtered = [...tasks];
@@ -114,6 +117,20 @@ export const TaskList: React.FC<TaskListProps> = ({
     completed: tasks.filter(t => t.completed).length,
     overdue: tasks.filter(t => t.dueDate && isPast(t.dueDate) && !t.completed).length,
   }), [tasks]);
+
+  const handleEditTask = (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+      setEditingTask(task);
+      setIsEditDialogOpen(true);
+    }
+  };
+
+  const handleSaveEdit = async (taskId: string, updates: Partial<Task>) => {
+    await onEdit(taskId, updates);
+    setIsEditDialogOpen(false);
+    setEditingTask(null);
+  };
 
   if (tasks.length === 0) {
     return (
@@ -261,7 +278,7 @@ export const TaskList: React.FC<TaskListProps> = ({
                   task={task}
                   onToggleComplete={onToggleComplete}
                   onDelete={onDelete}
-                  onEdit={onEdit}
+                  onEdit={handleEditTask}
                   index={index}
                 />
               ))}
@@ -269,6 +286,14 @@ export const TaskList: React.FC<TaskListProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Edit Task Dialog */}
+      <EditTaskDialog
+        task={editingTask}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onSave={handleSaveEdit}
+      />
     </div>
   );
 };

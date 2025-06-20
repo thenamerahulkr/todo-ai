@@ -18,35 +18,43 @@ const AppContent: React.FC = () => {
     addTask,
     toggleTaskComplete,
     deleteTask,
-    editTask
+    updateTask
   } = useTasks();
 
   const handleAddTask = async (input: string): Promise<void> => {
-    console.log('App: Starting task parsing for:', input);
+    console.log('📝 App: Starting task parsing for:', input);
     
     try {
       const parsedTask = await TaskParser.parse(input);
-      console.log('App: Task parsed successfully:', parsedTask);
+      console.log('✅ App: Task parsed successfully:', parsedTask);
       
       await addTask({
         ...parsedTask,
         completed: false
       });
-      console.log('App: Task added successfully');
+      console.log('🎉 App: Task added successfully');
     } catch (error) {
-      console.error('App: Failed to parse or add task:', error);
+      console.error('❌ App: Failed to parse or add task:', error);
       throw error; // Re-throw so TaskInput can handle the error state
     }
   };
 
+  // Show loading spinner only for a short time
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full"
-        />
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            className="w-12 h-12 border-3 border-primary border-t-transparent rounded-full mx-auto mb-4"
+          />
+          <p className="text-muted-foreground">Loading TuduAI...</p>
+        </motion.div>
       </div>
     );
   }
@@ -101,7 +109,7 @@ const AppContent: React.FC = () => {
               tasks={tasks}
               onToggleComplete={toggleTaskComplete}
               onDelete={deleteTask}
-              onEdit={editTask}
+              onEdit={updateTask}
             />
           </motion.div>
         </div>
