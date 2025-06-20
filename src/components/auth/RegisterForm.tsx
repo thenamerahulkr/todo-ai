@@ -16,7 +16,7 @@ const registerSchema = z.object({
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
-  path: ["confirmPassword"],
+  path: ['confirmPassword'],
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
@@ -29,6 +29,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) =
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [registerError, setRegisterError] = useState<string | null>(null);
   const { register: registerUser } = useAuth();
 
   const {
@@ -41,7 +42,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) =
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
-    await registerUser(data.email, data.name, data.password);
+    setRegisterError(null);
+    const errorMessage = await registerUser(data.email, data.name, data.password);
+    if (typeof errorMessage === 'string') setRegisterError(errorMessage);
     setIsLoading(false);
   };
 
@@ -182,6 +185,17 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) =
             <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
           )}
         </motion.div>
+
+        {registerError && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65 }}
+            className="text-sm text-destructive text-center"
+          >
+            {registerError}
+          </motion.div>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}

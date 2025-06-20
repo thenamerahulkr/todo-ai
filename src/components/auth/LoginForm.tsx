@@ -1,3 +1,5 @@
+// ✅ LoginForm.tsx (Updated Version With Error Message Display)
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
@@ -23,6 +25,7 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const { login } = useAuth();
 
   const {
@@ -35,7 +38,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    await login(data.email, data.password);
+    setLoginError(null);
+    const errorMessage = await login(data.email, data.password);
+    if (typeof errorMessage === 'string') setLoginError(errorMessage);
     setIsLoading(false);
   };
 
@@ -121,6 +126,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
             <p className="text-sm text-destructive">{errors.password.message}</p>
           )}
         </motion.div>
+
+        {loginError && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45 }}
+            className="text-sm text-destructive text-center"
+          >
+            {loginError}
+          </motion.div>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
