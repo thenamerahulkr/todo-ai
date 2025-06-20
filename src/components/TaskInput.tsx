@@ -105,7 +105,7 @@ export const TaskInput: React.FC<TaskInputProps> = ({ onAddTask, isLoading = fal
             />
             
             <div className="absolute bottom-3 right-3 flex items-center gap-2">
-              <Button
+              {/* <Button
                 type="button"
                 variant="ghost"
                 size="sm"
@@ -113,7 +113,7 @@ export const TaskInput: React.FC<TaskInputProps> = ({ onAddTask, isLoading = fal
                 className="w-9 h-9 p-0 rounded-xl hover:bg-primary/10"
               >
                 <Mic className="w-4 h-4" />
-              </Button>
+              </Button> */}
               
               <Button
                 type="submit"
