@@ -59,6 +59,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   index
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const CategoryIcon = categoryIcons[task.category];
   const priorityConf = priorityConfig[task.priority];
   const PriorityIcon = priorityConf.icon;
@@ -70,6 +71,9 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   };
 
   const isOverdue = task.dueDate && isPast(task.dueDate) && !task.completed;
+
+  // Show menu button when hovered OR when dropdown is open
+  const showMenuButton = isHovered || isDropdownOpen;
 
   return (
     <motion.div
@@ -128,27 +132,53 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             </div>
 
             <AnimatePresence>
-              {isHovered && (
+              {showMenuButton && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <DropdownMenu>
+                  <DropdownMenu 
+                    open={isDropdownOpen} 
+                    onOpenChange={setIsDropdownOpen}
+                  >
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-secondary">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0 hover:bg-secondary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsDropdownOpen(!isDropdownOpen);
+                        }}
+                      >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="glass border-border">
-                      <DropdownMenuItem onClick={() => onEdit(task.id)} className="hover:bg-secondary">
+                    <DropdownMenuContent 
+                      align="end" 
+                      className="glass border-border"
+                      onCloseAutoFocus={(e) => e.preventDefault()}
+                    >
+                      <DropdownMenuItem 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(task.id);
+                          setIsDropdownOpen(false);
+                        }} 
+                        className="hover:bg-secondary cursor-pointer"
+                      >
                         <Edit2 className="h-4 w-4 mr-2" />
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        onClick={() => onDelete(task.id)}
-                        className="text-destructive hover:bg-destructive/10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(task.id);
+                          setIsDropdownOpen(false);
+                        }}
+                        className="text-destructive hover:bg-destructive/10 cursor-pointer"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete
