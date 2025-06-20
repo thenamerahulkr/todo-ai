@@ -37,7 +37,6 @@ import {
   BookOpen,
   HelpCircle
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 const editTaskSchema = z.object({
   title: z.string().min(1, 'Title is required').max(100, 'Title too long'),
